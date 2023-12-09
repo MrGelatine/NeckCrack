@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@+id/menuFragment">
+    <fragment
+        android:id="@+id/exerciseCameraFragment"
+        android:name="com.google.ar.core.examples.java.neckcrack.ExerciseCameraFragment"
+        android:label="ExerciseCameraFragment" >
+        <action
+            android:id="@+id/action_exerciseCameraFragment_to_menuFragment"
+            app:destination="@id/menuFragment"
+            app:popUpTo="@id/menuFragment"/>
+    </fragment>
+    <fragment
+        android:id="@+id/menuFragment"
+        android:name="com.google.ar.core.examples.java.neckcrack.MenuFragment"
+        android:label="MenuFragment" >
+        <action
+            android:id="@+id/action_menuFragment_to_exerciseCameraFragment"
+            app:destination="@id/exerciseCameraFragment" />
+        <action
+            android:id="@+id/action_menuFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_menuFragment_to_dummyFragment"
+            app:destination="@id/dummyFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.google.ar.core.examples.java.neckcrack.SettingsFragment"
+        android:label="SettingsFragment"/>
+    <fragment
+        android:id="@+id/dummyFragment"
+        android:name="com.google.ar.core.examples.java.neckcrack.DummyFragment"
+        android:label="fragment_dummy"
+        tools:layout="@layout/fragment_dummy" >
+        <action
+            android:id="@+id/action_dummyFragment_to_menuFragment"
+            app:destination="@id/menuFragment" />
+    </fragment>
+</navigation>
