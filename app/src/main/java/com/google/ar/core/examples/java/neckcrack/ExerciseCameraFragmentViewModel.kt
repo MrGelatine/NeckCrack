@@ -5,7 +5,11 @@ import android.os.Looper
 import androidx.databinding.ObservableField
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.IOException
 
 class ExerciseCameraFragmentViewModel : ViewModel() {
@@ -69,11 +73,11 @@ class ExerciseCameraFragmentViewModel : ViewModel() {
             nodChecker = false
             target_head_state = States.DONE
             currentFaceRender = augmentedOKFaceRenderer
-            val mainHandler = Handler(Looper.getMainLooper())
-            mainHandler.postDelayed({
+            viewModelScope.launch(Dispatchers.Main) {
+                delay(2000)
                 navController!!.navigateUp()
                 nod_counter.set(0)
-            }, 2000)
+            }
         }
     }
 
