@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    tools:context="com.google.ar.core.examples.java.neckcrack.AugmentedFacesActivityViewModel">
+
+    <data>
+        <variable
+            name="exerciseCameraFragmentViewModel"
+            type="com.google.ar.core.examples.java.neckcrack.ExerciseCameraFragmentViewModel" />
+    </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="com.google.ar.core.examples.java.neckcrack.AugmentedFacesActivityViewModel">
-
+        android:layout_height="match_parent">
 
         <Button
             android:id="@+id/ExerciseButton"
