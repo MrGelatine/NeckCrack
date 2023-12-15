@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
+<layout
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    tools:context="com.google.ar.core.examples.java.neckcrack.AugmentedFacesActivityViewModel">
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
         <variable
@@ -12,7 +11,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/constraint_menu">
 
         <Button
             android:id="@+id/ExerciseButton"

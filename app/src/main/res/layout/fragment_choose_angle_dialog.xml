@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable
+            name="viewModel"
+            type="com.google.ar.core.examples.java.neckcrack.SettingsViewModel" />
+    </data>
+
+        <NumberPicker
+            android:id="@+id/numberPicker"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="64dp"
+            android:width="50dp"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+</layout>

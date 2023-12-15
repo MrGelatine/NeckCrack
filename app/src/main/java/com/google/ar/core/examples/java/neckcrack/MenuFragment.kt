@@ -11,14 +11,14 @@ import androidx.navigation.Navigation.findNavController
 import com.google.ar.core.examples.java.neckcrack.databinding.FragmentMenuBinding
 
 class MenuFragment : Fragment() {
-    var navController: NavController? = null
+    lateinit var navController: NavController
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val binding:FragmentMenuBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_menu, container, false)
-        binding.ExerciseButton.setOnClickListener { v -> navController!!.navigate(R.id.action_menuFragment_to_exerciseCameraFragment) }
-        binding.SettingButton.setOnClickListener { v -> navController!!.navigate(R.id.action_menuFragment_to_dummyFragment) }
+        binding.ExerciseButton.setOnClickListener { v -> navController.navigate(R.id.action_menuFragment_to_exerciseCameraFragment) }
+        binding.SettingButton.setOnClickListener { v -> navController.navigate(R.id.action_menuFragment_to_settingsFragment) }
         return binding.getRoot()
     }
 

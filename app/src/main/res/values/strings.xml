@@ -31,4 +31,12 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="head_angles_header">Neck options</string>
+
+    <string name="left_angle">Left Angle Value</string>
+    <string name="right_angle">Right Angle Value</string>
+    <string name="forward_angle">Forward Angle Value</string>
+    <string name="back_angle">Back Angle Value</string>
+
+    <string name="preference_file_key">com.google.ar.core.examples.java.neckcrack</string>
 </resources>

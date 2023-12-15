@@ -17,19 +17,20 @@ package com.google.ar.core.examples.java.neckcrack
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.google.ar.core.examples.java.common.helpers.TrackingStateHelper
 import com.google.ar.core.examples.java.neckcrack.databinding.ActivityMainBinding
 
 class AugmentedFacesActivity : AppCompatActivity() {
-    private var viewModel: AugmentedFacesActivityViewModel? = null
+    private val viewModel: AugmentedFacesActivityViewModel by viewModels()
 
     @SuppressLint("CommitTransaction")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(AugmentedFacesActivityViewModel::class.java)
         viewModel!!.trackingStateHelper = TrackingStateHelper(this)
         val binding: ActivityMainBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_main)
