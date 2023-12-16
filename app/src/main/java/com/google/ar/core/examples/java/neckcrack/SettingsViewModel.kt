@@ -79,15 +79,23 @@ class SettingsViewModel : ViewModel() {
         return false
     }
     fun callCalibrationLeft(): Boolean{
+        val action = SettingsFragmentDirections.actionSettingsFragmentToCalibrationFragment("LEFT")
+        navController.navigate(action)
         return false
     }
     fun callCalibrationRight(): Boolean{
+        val action = SettingsFragmentDirections.actionSettingsFragmentToCalibrationFragment("RIGHT")
+        navController.navigate(action)
         return false
     }
     fun callCalibrationForward(): Boolean{
+        val action = SettingsFragmentDirections.actionSettingsFragmentToCalibrationFragment("FORWARD")
+        navController.navigate(action)
         return false
     }
     fun callCalibrationBack(): Boolean{
+        val action = SettingsFragmentDirections.actionSettingsFragmentToCalibrationFragment("BACK")
+        navController.navigate(action)
         return false
     }
 

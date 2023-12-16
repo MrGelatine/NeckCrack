@@ -34,23 +34,23 @@
                 android:name="AngleType"
                 app:argType="string" />
         </action>
+        <action
+            android:id="@+id/action_settingsFragment_to_calibrationFragment"
+            app:destination="@id/calibrationFragment" >
+            <argument
+                android:name="AngleType"
+                app:argType="string" />
+        </action>
     </fragment>
     <dialog
         android:id="@+id/chooseAngleDialogFragment"
         android:name="com.google.ar.core.examples.java.neckcrack.ChooseAngleDialogFragment"
         android:label="fragment_choose_angle_dialog"
         tools:layout="@layout/fragment_choose_angle_dialog">
-        <action
-            android:id="@+id/action_chooseAngleDialogFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment">
-            <argument
-                android:name="AngleValue"
-                app:argType="float" />
-            <argument
-                android:name="AngleType"
-                app:argType="string" />
-        </action>
-
-
     </dialog>
+    <fragment
+        android:id="@+id/calibrationFragment"
+        android:name="com.google.ar.core.examples.java.neckcrack.CalibrationFragment"
+        android:label="fragment_calibration"
+        tools:layout="@layout/fragment_calibration" />
 </navigation>

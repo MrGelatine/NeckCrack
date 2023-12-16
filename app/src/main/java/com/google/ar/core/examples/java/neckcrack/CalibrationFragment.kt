@@ -1,21 +1,24 @@
 package com.google.ar.core.examples.java.neckcrack
 
+import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
+import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import androidx.navigation.Navigation.findNavController
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.navArgs
 import com.google.ar.core.ArCoreApk
-import com.google.ar.core.ArCoreApk.InstallStatus
 import com.google.ar.core.AugmentedFace
 import com.google.ar.core.CameraConfig
 import com.google.ar.core.CameraConfigFilter
@@ -29,6 +32,7 @@ import com.google.ar.core.examples.java.common.helpers.FullScreenHelper
 import com.google.ar.core.examples.java.common.helpers.SnackbarHelper
 import com.google.ar.core.examples.java.common.helpers.TrackingStateHelper
 import com.google.ar.core.examples.java.common.rendering.BackgroundRenderer
+import com.google.ar.core.examples.java.neckcrack.databinding.FragmentCalibrationBinding
 import com.google.ar.core.examples.java.neckcrack.databinding.FragmentExerciseCameraBinding
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableApkTooOldException
@@ -36,54 +40,58 @@ import com.google.ar.core.exceptions.UnavailableArcoreNotInstalledException
 import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.EnumSet
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class ExerciseCameraFragment : Fragment(), GLSurfaceView.Renderer,
+class CalibrationFragment : Fragment(), GLSurfaceView.Renderer,
     IOnFocusListenable {
-    private lateinit var surfaceView: GLSurfaceView
+    private var surfaceView: GLSurfaceView? = null
     private var installRequested = false
     private var session: Session? = null
     private val messageSnackbarHelper = SnackbarHelper()
     private var displayRotationHelper: DisplayRotationHelper? = null
     private var trackingStateHelper: TrackingStateHelper? = null
     private val backgroundRenderer = BackgroundRenderer()
-    private val activityViewModel: AugmentedFacesActivityViewModel by activityViewModels()
+    private var activityViewModel: AugmentedFacesActivityViewModel? = null
     private var fragmentActivity: FragmentActivity? = null
     private var navController: NavController? = null
-    private val viewModel: ExerciseCameraFragmentViewModel by activityViewModels()
+    private val viewModel: CalibrationViewModel by activityViewModels()
+    private val parentViewModel: SettingsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         fragmentActivity = activity
-        val binding: FragmentExerciseCameraBinding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_exercise_camera, container, false)
-        binding.exerciseCameraFragmentViewModel = viewModel
-        surfaceView = binding.exerciseSurfaceView
+        activityViewModel = ViewModelProvider(requireActivity()).get(
+            AugmentedFacesActivityViewModel::class.java
+        )
+        val binding: FragmentCalibrationBinding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_calibration, container, false)
+        binding.viewModel = viewModel
+        surfaceView = binding.calibrationSurfaceView
         displayRotationHelper = DisplayRotationHelper(context)
-        surfaceView.preserveEGLContextOnPause = true
-        surfaceView.setEGLContextClientVersion(2)
-        surfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0)
-        surfaceView.setRenderer(this)
-        surfaceView.renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
-        surfaceView.setWillNotDraw(false)
+        surfaceView!!.preserveEGLContextOnPause = true
+        surfaceView!!.setEGLContextClientVersion(2)
+        surfaceView!!.setEGLConfigChooser(8, 8, 8, 8, 16, 0)
+        surfaceView!!.setRenderer(this)
+        surfaceView!!.renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
+        surfaceView!!.setWillNotDraw(false)
         trackingStateHelper = activityViewModel!!.trackingStateHelper
         installRequested = false
         return binding.getRoot()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.navController = findNavController(view)
-        viewModel.context = requireActivity()
-        viewModel.loadAngles()
-        viewModel.nodChecker = true
-
-        viewModel.setNodVector(ExerciseCameraFragmentViewModel.States.LEFT)
-        navController = findNavController(view)
+        viewModel.navController = Navigation.findNavController(view)
+        viewModel.parentViewModel = parentViewModel
+        navController = Navigation.findNavController(view)
+        viewModel.target_head_state = arguments?.getString("AngleType", "Nothing") ?: "Nothing"
     }
 
     override fun onDestroy() {
@@ -101,12 +109,12 @@ class ExerciseCameraFragment : Fragment(), GLSurfaceView.Renderer,
             var message: String? = null
             try {
                 when (ArCoreApk.getInstance().requestInstall(fragmentActivity, !installRequested)) {
-                    InstallStatus.INSTALL_REQUESTED -> {
+                    ArCoreApk.InstallStatus.INSTALL_REQUESTED -> {
                         installRequested = true
                         return
                     }
 
-                    InstallStatus.INSTALLED -> {}
+                    ArCoreApk.InstallStatus.INSTALLED -> {}
                 }
                 if (!CameraPermissionHelper.hasCameraPermission(fragmentActivity)) {
                     CameraPermissionHelper.requestCameraPermission(fragmentActivity)
@@ -196,7 +204,7 @@ class ExerciseCameraFragment : Fragment(), GLSurfaceView.Renderer,
         GLES20.glClearColor(0.1f, 0.1f, 0.1f, 1.0f)
         try {
             backgroundRenderer.createOnGlThread(fragmentActivity)
-            viewModel!!.setUpRenderers(fragmentActivity!!)
+            viewModel!!.setUpRenderer(fragmentActivity!!)
         } catch (e: IOException) {
             Log.e(TAG, "Failed to read an asset file", e)
         }
@@ -244,10 +252,48 @@ class ExerciseCameraFragment : Fragment(), GLSurfaceView.Renderer,
                 //Forward: [0.21479343, -0.03203746, 0.00987039, 0.976084]
                 val horizontal_face_coeficient = face_rotation[2]
                 val vertical_face_cefficient = face_rotation[0]
-                viewModel!!.checkState(horizontal_face_coeficient, vertical_face_cefficient)
-                viewModel!!.currentFaceRender.draw(
-                    projectionMatrix, viewMatrix, modelMatrix, colorCorrectionRgba, face
-                )
+                    viewModel.faceRenderer.draw(
+                        projectionMatrix, viewMatrix, modelMatrix, colorCorrectionRgba, face
+                    )
+                if(viewModel.freezed){
+                    val sharedPref = context?.getSharedPreferences(
+                        activity?.getString(R.string.preference_file_key), Context.MODE_PRIVATE)!!
+                    when(viewModel.target_head_state){
+                        "FORWARD" -> {
+                            parentViewModel.forwardAngle.set(vertical_face_cefficient)
+                            with (sharedPref.edit()) {
+                                putFloat(activity?.getString(R.string.forward_angle), vertical_face_cefficient)
+                                apply()
+                            }
+                        }
+                        "BACK" -> {
+                            parentViewModel.backAngle.set(-1f * vertical_face_cefficient)
+                            with (sharedPref.edit()) {
+                                putFloat(activity?.getString(R.string.back_angle), -1f * vertical_face_cefficient)
+                                apply()
+                            }
+                        }
+                        "LEFT" -> {
+                            parentViewModel.leftAngle.set(-1f * horizontal_face_coeficient)
+                            with (sharedPref.edit()) {
+                                putFloat(activity?.getString(R.string.left_angle), -1f * horizontal_face_coeficient)
+                                apply()
+                            }
+                        }
+                        "RIGHT" -> {
+                            parentViewModel.rightAngle.set(horizontal_face_coeficient)
+                            with (sharedPref.edit()) {
+                                putFloat(activity?.getString(R.string.right_angle), horizontal_face_coeficient)
+                                apply()
+                            }
+                        }
+                    }
+                    lifecycleScope.launch(Dispatchers.Main){
+                        viewModel.freezed = false
+                        navController!!.navigateUp()
+                    }
+                }
+
             }
         } catch (t: Throwable) {
             Log.e(TAG, "Exception on the OpenGL thread", t)

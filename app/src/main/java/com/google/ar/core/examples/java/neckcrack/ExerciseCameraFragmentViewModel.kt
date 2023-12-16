@@ -1,5 +1,7 @@
 package com.google.ar.core.examples.java.neckcrack
 
+import android.accessibilityservice.AccessibilityGestureEvent
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import androidx.databinding.ObservableField
@@ -11,12 +13,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.IOException
+import kotlin.properties.Delegates
 
 class ExerciseCameraFragmentViewModel : ViewModel() {
     enum class States {
         LEFT, RIGHT, FORWARD, BACK, DONE
     }
-
     val nod_counter = ObservableField(0)
     var max_nods = 10
     val augmentedOKFaceRenderer = AugmentedFaceRenderer()
@@ -29,6 +31,23 @@ class ExerciseCameraFragmentViewModel : ViewModel() {
     var nodChecker = false
     var navController: NavController? = null
     var target_head_state = States.LEFT
+    lateinit var context: FragmentActivity
+    var leftAngle by Delegates.notNull<Float>()
+    var rightAngle by Delegates.notNull<Float>()
+    var forwardAngle by Delegates.notNull<Float>()
+    var backAngle by Delegates.notNull<Float>()
+
+    fun loadAngles(){
+        val sharedPref = context?.getSharedPreferences(
+            context.getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        if(sharedPref != null){
+            leftAngle = sharedPref.getFloat(context.getString(R.string.left_angle),0.2f)
+            rightAngle = sharedPref.getFloat(context.getString(R.string.right_angle),0.2f)
+            forwardAngle = sharedPref.getFloat(context.getString(R.string.forward_angle),0.2f)
+            backAngle = sharedPref.getFloat(context.getString(R.string.back_angle),0.2f)
+        }
+
+    }
     @Throws(IOException::class)
     fun setUpRenderers(activity: FragmentActivity) {
         augmentedLeftFaceRenderer.createOnGlThread(activity, "models/face_left.png")

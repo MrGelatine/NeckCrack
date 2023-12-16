@@ -1,32 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+<layout xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable
-            name="exerciseCameraFragmentViewModel"
-            type="com.google.ar.core.examples.java.neckcrack.ExerciseCameraFragmentViewModel" />
+            name="viewModel"
+            type="com.google.ar.core.examples.java.neckcrack.CalibrationViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/constraint_exercise">
+        android:id="@+id/constraint_calibration">
         <android.opengl.GLSurfaceView
-            android:id="@+id/exercise_surface_view"
+            android:id="@+id/calibration_surface_view"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_gravity="top"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/nodView"
-            android:layout_width="107dp"
-            android:layout_height="59dp"
-            android:gravity="center"
-            android:text="@{String.valueOf(exerciseCameraFragmentViewModel.nod_counter) + '/' + String.valueOf(exerciseCameraFragmentViewModel.max_nods)}"
-            app:layout_constraintBottom_toBottomOf="@+id/exercise_surface_view"
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="Button"
+            android:onClick="@{() -> viewModel.freezeFaceAngle()}"
+            app:layout_constraintBottom_toBottomOf="@+id/calibration_surface_view"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
